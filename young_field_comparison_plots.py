@@ -7,7 +7,7 @@ from scipy import stats
 from operator import sub
 from scipy.interpolate import interp1d
 import BDdb
-db = BDdb.get_db('/Users/victoriaditomasso/Dropbox/BDNYCdb/bdnyc.db')
+db = BDdb.get_db('/Users/victoriaditomasso/Dropbox/BDNYCdb/BDNYCdeprecated.db')
 
 # The inputs for this function are the three spectral IDs, in the order young, target and field aged plus the radial velocity of the target object
 def yfcp(spec_young, spec_target, spec_field, rv_tar): 
@@ -31,8 +31,8 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 	f_field = np.asarray(data_field[1][0:1010])
 		
 	# Shifts the wavelength of the young and field objects using the radial velocity of the target, so that they will line up horizontally when plotted
-	shifted_w_young = (w_young)*(1.+(rv_tar/2.99792458e5))
-	shifted_w_field = (w_field)*(1.+(rv_tar/2.99792458e5))
+	shifted_w_young = ((w_young)*(1.+(rv_tar/2.99792458e5)))+shift_young
+	shifted_w_field = (w_field)*(1.+(rv_tar/2.99792458e5))+shift_field
 	
 	# I use the average of the fluxes to make the three spectra line up vertically
 	avg_f_tar=np.mean(f_tar)
@@ -56,7 +56,7 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 
 	# Interpolates the flux for the young and field objects so that when I subtract them from the target flux, I will get a properly calculated residual
 	x_tar = w_tar
-	xp_young = w_young
+	xp_young = shifted_w_young
 	fp_young = f_young
 	f_young_interp = np.interp(x_tar, xp_young, fp_young)
 
@@ -67,6 +67,157 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 	# Subtracting the fluxes to get the residual flux
 	young_difference = (f_tar + add_to_f_tar) - (f_young_interp + add_to_f_young)
 	field_difference = (f_tar + add_to_f_tar) - (f_field_interp + add_to_f_field)
+	
+	# Changes the spectral type label from numbers to letter and number (ex: 6.5 becomes M6.5)
+	if tar_spec_type == 6.5:
+		tar_spec_type = 'M6.5'
+	if tar_spec_type == 7.0:
+		tar_spec_type = 'M7.0'
+	if tar_spec_type == 7.5:
+		tar_spec_type = 'M7.5'
+	if tar_spec_type == 8.0:
+		tar_spec_type = 'M8.0'
+	if tar_spec_type == 8.5:
+		tar_spec_type = 'M8.5'
+	if tar_spec_type == 9.0:
+		tar_spec_type = 'M9.0'
+	if tar_spec_type == 9.5:
+		tar_spec_type = 'M9.5'
+	if tar_spec_type == 10.0:
+		tar_spec_type = 'L0.0'
+	if tar_spec_type == 10.5:
+		tar_spec_type = 'L0.5'
+	if tar_spec_type == 11.0:
+		tar_spec_type = 'L1.0'
+	if tar_spec_type == 11.5:
+		tar_spec_type = 'L1.5'
+	if tar_spec_type == 12.0:
+		tar_spec_type = 'L2.0'
+	if tar_spec_type == 12.5:
+		tar_spec_type = 'L2.5'
+	if tar_spec_type == 13.0:
+		tar_spec_type = 'L3.0'
+	if tar_spec_type == 13.5:
+		tar_spec_type = 'L3.5'
+	if tar_spec_type == 14.0:
+		tar_spec_type = 'L4.0'
+	if tar_spec_type == 14.5:
+		tar_spec_type = 'L4.5'
+	if tar_spec_type == 15.0:
+		tar_spec_type = 'L5.0'
+	if tar_spec_type == 15.5:
+		tar_spec_type = 'L5.5'
+	if tar_spec_type == 16.0:
+		tar_spec_type = 'L6.0'
+	if tar_spec_type == 16.5:
+		tar_spec_type = 'L6.5'
+	if tar_spec_type == 17.0:
+		tar_spec_type = 'L7.0'
+	if tar_spec_type == 17.5:
+		tar_spec_type = 'L7.5'
+	if tar_spec_type == 18.0:
+		tar_spec_type = 'L8.0'
+		
+		
+	if young_spec_type == 6.5:
+		young_spec_type = 'M6.5'
+	if young_spec_type == 7.0:
+		young_spec_type = 'M7.0'
+	if young_spec_type == 7.5:
+		young_spec_type = 'M7.5'
+	if young_spec_type == 8.0:
+		young_spec_type = 'M8.0'
+	if young_spec_type == 8.5:
+		young_spec_type = 'M8.5'
+	if young_spec_type == 9.0:
+		young_spec_type = 'M9.0'
+	if young_spec_type == 9.5:
+		young_spec_type = 'M9.5'
+	if young_spec_type == 10.0:
+		young_spec_type = 'L0.0'
+	if young_spec_type == 10.5:
+		young_spec_type = 'L0.5'
+	if young_spec_type == 11.0:
+		young_spec_type = 'L1.0'
+	if young_spec_type == 11.5:
+		young_spec_type = 'L1.5'
+	if young_spec_type == 12.0:
+		young_spec_type = 'L2.0'
+	if young_spec_type == 12.5:
+		young_spec_type = 'L2.5'
+	if young_spec_type == 13.0:
+		young_spec_type = 'L3.0'
+	if young_spec_type == 13.5:
+		young_spec_type = 'L3.5'
+	if young_spec_type == 14.0:
+		young_spec_type = 'L4.0'
+	if young_spec_type == 14.5:
+		young_spec_type = 'L4.5'
+	if young_spec_type == 15.0:
+		young_spec_type = 'L5.0'
+	if young_spec_type == 15.5:
+		young_spec_type = 'L5.5'
+	if young_spec_type == 16.0:
+		young_spec_type = 'L6.0'
+	if young_spec_type == 16.5:
+		young_spec_type = 'L6.5'
+	if young_spec_type == 17.0:
+		young_spec_type = 'L7.0'
+	if young_spec_type == 17.5:
+		young_spec_type = 'L7.5'
+	if young_spec_type == 18.0:
+		young_spec_type = 'L8.0'
+		
+		
+	if field_spec_type == 6.5:
+		field_spec_type = 'M6.5'
+	if field_spec_type == 7.0:
+		field_spec_type = 'M7.0'
+	if field_spec_type == 7.5:
+		field_spec_type = 'M7.5'
+	if field_spec_type == 8.0:
+		field_spec_type = 'M8.0'
+	if field_spec_type == 8.5:
+		field_spec_type = 'M8.5'
+	if field_spec_type == 9.0:
+		field_spec_type = 'M9.0'
+	if field_spec_type == 9.5:
+		field_spec_type = 'M9.5'
+	if field_spec_type == 10.0:
+		field_spec_type = 'L0.0'
+	if field_spec_type == 10.5:
+		field_spec_type = 'L0.5'
+	if field_spec_type == 11.0:
+		field_spec_type = 'L1.0'
+	if field_spec_type == 11.5:
+		field_spec_type = 'L1.5'
+	if field_spec_type == 12.0:
+		field_spec_type = 'L2.0'
+	if field_spec_type == 12.5:
+		field_spec_type = 'L2.5'
+	if field_spec_type == 13.0:
+		field_spec_type = 'L3.0'
+	if field_spec_type == 13.5:
+		field_spec_type = 'L3.5'
+	if field_spec_type == 14.0:
+		field_spec_type = 'L4.0'
+	if field_spec_type == 14.5:
+		field_spec_type = 'L4.5'
+	if field_spec_type == 15.0:
+		field_spec_type = 'L5.0'
+	if field_spec_type == 15.5:
+		field_spec_type = 'L5.5'
+	if field_spec_type == 16.0:
+		field_spec_type = 'L6.0'
+	if field_spec_type == 16.5:
+		field_spec_type = 'L6.5'
+	if field_spec_type == 17.0:
+		field_spec_type = 'L7.0'
+	if field_spec_type == 17.5:
+		field_spec_type = 'L7.5'
+	if field_spec_type == 18.0:
+		field_spec_type = 'L8.0'
+
 	
 	# This is made up of two subplots	
 	plt.subplot(211)
