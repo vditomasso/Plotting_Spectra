@@ -9,8 +9,9 @@ from scipy.interpolate import interp1d
 import BDdb
 db = BDdb.get_db('/Users/victoriaditomasso/Dropbox/BDNYCdb/BDNYCdeprecated.db')
 
-# The inputs for this function are the three spectral IDs, in the order young, target and field aged plus the radial velocity of the target object
-def yfcp(spec_young, spec_target, spec_field, rv_tar): 
+# The inputs for this function are the three spectral IDs, in the order young, target and field aged plus the radial velocity of the target object and an optional shift value for the young & field objects
+def yfcp(spec_young, spec_target, spec_field, rv_tar=0, shift_young=0, shift_field=0):
+ 
 
 	# This clears the figure, useful when saving the plots (not just showing them). If you save the same plot repeatedly, clearing the figure keeps it from plotting over itself
 	plt.clf() 
@@ -42,6 +43,10 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 	add_to_f_young = 1 - avg_f_young
 	add_to_f_field = 1 - avg_f_field
 	add_to_f_tar = 1 - avg_f_tar
+	
+	f_young_normalized = f_young + add_to_f_young
+	f_tar_normalized = f_tar + add_to_f_tar
+	f_field_normalized = f_field + add_to_f_field
 		
 	# Parses out the shortnames, spectral types and the wavelength order (I only specified the target wavelength order, but it's the same for all of the objects)	
 	tar_name = data_target[2]
@@ -57,16 +62,18 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 	# Interpolates the flux for the young and field objects so that when I subtract them from the target flux, I will get a properly calculated residual
 	x_tar = w_tar
 	xp_young = shifted_w_young
-	fp_young = f_young
+	fp_young = f_young_normalized
 	f_young_interp = np.interp(x_tar, xp_young, fp_young)
+# 	print "f_young_interp = ", f_young_interp
 
-	xp_field = w_field
-	fp_field = f_field
+	xp_field = shifted_w_field
+	fp_field = f_field_normalized
 	f_field_interp = np.interp(x_tar, xp_field, fp_field)
+# 	print "f_field_interp = ", f_field_interp
 	
 	# Subtracting the fluxes to get the residual flux
-	young_difference = (f_tar + add_to_f_tar) - (f_young_interp + add_to_f_young)
-	field_difference = (f_tar + add_to_f_tar) - (f_field_interp + add_to_f_field)
+	young_difference = (f_tar_normalized) - (f_young_interp)
+	field_difference = (f_tar_normalized) - (f_field_interp)
 	
 	# Changes the spectral type label from numbers to letter and number (ex: 6.5 becomes M6.5)
 	if tar_spec_type == 6.5:
@@ -224,9 +231,11 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 	# This makes the two plots share an x axis
 	plt.gca().axes.get_xaxis().set_visible(False)
 	# Plots the target object
-	plt.plot(w_tar,f_tar + add_to_f_tar,color='black', linewidth = 2)
+	plt.plot(w_tar,f_tar_normalized,color='black', linewidth = 2)
 	# Plots the young object
-	plt.plot(shifted_w_young, f_young + add_to_f_young,color='r',label='2MASS ' + str(young_name), linewidth = 2)
+	plt.plot(shifted_w_young, f_young_normalized,color='r',label='2MASS ' + str(young_name), linewidth = 2)
+	# Plots the young object using the interpolated flux values
+# 	plt.plot(w_tar, f_young_interp, color='g', linewidth = 2)
 	# Plots the residual
 	plt.plot(w_tar, young_difference, color = 'gray',label='Residuals', linewidth = 2)
 	# Sets the title
@@ -239,9 +248,11 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 	# Makes the second subplot	
 	plt.subplot(212)
 	# Plots the target object
-	plt.plot(w_tar,f_tar + add_to_f_tar,color='black', linewidth = 2)
+	plt.plot(w_tar,f_tar_normalized,color='black', linewidth = 2)
 	# Plots the field object
-	plt.plot(shifted_w_field, f_field + add_to_f_field,color='b',label='2MASS ' + str(field_name), linewidth = 2)
+	plt.plot(shifted_w_field, f_field_normalized,color='b',label='2MASS ' + str(field_name), linewidth = 2)
+	# Plots the field object using the interpolated flux values
+# 	plt.plot(w_tar, f_field_interp,color='g', linewidth = 2)
 	# Plots the residual
 	plt.plot(w_tar, field_difference, color = 'gray', label='Residuals', linewidth = 2)
 	# Sets the x-axis label
@@ -277,3 +288,14 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar):
 	plt.show()	
 	# Saves the plot
 # 	plt.savefig(figname)
+
+	# Saves a textfile with your inputs so you can recreate the plot later
+	line1 = 'spec_young = '+str(spec_young)+', '+'2M'+str(young_name) 
+	line2 = 'spec_target = '+str(spec_target)+', '+'2M'+str(tar_name)
+	line3 = 'spec_field = '+str(spec_field)+', '+'2M'+str(field_name)
+	line4 = 'rv_tar = '+str(rv_tar)+', shift_young = '+str(shift_young)+', shift_field = '+str(shift_field)
+	
+	text = open(str(figname) + '.txt', "w")
+# 	text_file.writelines([line1, line2, line3, line4])
+	text.write("%s \n %s \n %s \n %s \n" % (line1, line2, line3, line4))
+	text.close()
