@@ -74,7 +74,11 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar=0, shift_young=0, shift_fie
 	# Subtracting the fluxes to get the residual flux
 	young_difference = (f_tar_normalized) - (f_young_interp)
 	field_difference = (f_tar_normalized) - (f_field_interp)
-	
+
+	# Calculates the root mean square error of the residuals for a quantification of the fit
+	rmse_young = (np.sum(young_difference**2))/(len(young_difference))**(0.5)
+	rmse_field = (np.sum(field_difference**2))/(len(field_difference))**(0.5)
+
 	# Changes the spectral type label from numbers to letter and number (ex: 6.5 becomes M6.5)
 	if tar_spec_type == 6.5:
 		tar_spec_type = 'M6.5'
@@ -284,18 +288,24 @@ def yfcp(spec_young, spec_target, spec_field, rv_tar=0, shift_young=0, shift_fie
 	fig.text(.73, .29, '2M' + tar_name, color='black', fontsize=30)
 	fig.text(.73, .26, 'Residuals', color='gray', fontsize=30)
 
+
+	# Prints the quantification of the fits on the plots
+	fig.text(.15,.51, 'RMSE young = ' + str(rmse_young), fontsize=25)
+	fig.text(.15, .11, 'RMSE field = ' + str(rmse_field), fontsize=25)
+
 	# Shows the plot
 	plt.show()	
 	# Saves the plot
 # 	plt.savefig(figname)
 
-	# Saves a textfile with your inputs so you can recreate the plot later
+	# Saves a textfile with your inputs so you can recreate the plot later, plus it save the RMSE values
 	line1 = 'spec_young = '+str(spec_young)+', '+'2M'+str(young_name) 
 	line2 = 'spec_target = '+str(spec_target)+', '+'2M'+str(tar_name)
 	line3 = 'spec_field = '+str(spec_field)+', '+'2M'+str(field_name)
 	line4 = 'rv_tar = '+str(rv_tar)+', shift_young = '+str(shift_young)+', shift_field = '+str(shift_field)
-	
+	line5 = 'young: RMSE = ' + str(rmse_young)
+	line6 = 'field: RMSE = ' + str(rmse_field)
+
 	text = open(str(figname) + '.txt', "w")
-# 	text_file.writelines([line1, line2, line3, line4])
-	text.write("%s \n %s \n %s \n %s \n" % (line1, line2, line3, line4))
+	text.write("%s \n %s \n %s \n %s \n %s \n %s \n" % (line1, line2, line3, line4, line5, line6))
 	text.close()
