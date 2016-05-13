@@ -14,7 +14,7 @@ t0117 = db.query.execute("select spectra.wavelength, spectra.flux, spectral_type
 t0045 = db.query.execute("select spectra.wavelength, spectra.flux, spectral_types.spectral_type, sources.shortname from spectra join spectral_types on spectra.source_id=spectral_types.source_id join sources on sources.id=spectra.source_id where sources.id=334 and spectra.wavelength_order=62").fetchone()
 t1551 = db.query.execute("select spectra.wavelength, spectra.flux, spectral_types.spectral_type, sources.shortname from spectra join spectral_types on spectra.source_id=spectral_types.source_id join sources on sources.id=spectra.source_id where sources.id=84 and spectra.wavelength_order=62").fetchone()
 t2154 = db.query.execute("select spectra.wavelength, spectra.flux, spectral_types.spectral_type, sources.shortname from spectra join spectral_types on spectra.source_id=spectral_types.source_id join sources on sources.id=spectra.source_id where sources.id=313 and spectra.wavelength_order=62").fetchone()
-t1625 = db.query.execute("select spectra.wavelength, spectra.flux, spectral_types.spectral_type, sources.shortname from spectra join spectral_types on spectra.source_id=spectral_types.source_id join sources on sources.id=spectra.source_id where sources.id=854 and spectra.wavelength_order=62").fetchone()
+t1615 = db.query.execute("select spectra.wavelength, spectra.flux, spectral_types.spectral_type, sources.shortname from spectra join spectral_types on spectra.source_id=spectral_types.source_id join sources on sources.id=spectra.source_id where sources.id=854 and spectra.wavelength_order=62").fetchone()
 t0047 = db.query.execute("select spectra.wavelength, spectra.flux, spectral_types.spectral_type, sources.shortname from spectra join spectral_types on spectra.source_id=spectral_types.source_id join sources on sources.id=spectra.source_id where sources.id=1722 and spectra.wavelength_order=62").fetchone()
 
 plt.clf()
@@ -34,7 +34,7 @@ plt.step(t0117[0],t0117[1]+5 + (1 - (np.mean(t0534[1]))), label='2M'+str(t0117[3
 plt.step(t0045[0],t0045[1]+4 + (1 - (np.mean(t0534[1]))), label='2M'+str(t0045[3])+' '+str(t0045[2]), color='black')
 plt.step(t1551[0],t1551[1]+3 + (1 - (np.mean(t0534[1]))), label='2M'+str(t1551[3])+' '+str(t1551[2]), color='black')
 plt.step(t2154[0],t2154[1]+2 + (1 - (np.mean(t0534[1]))), label='2M'+str(t2154[3])+' '+str(t2154[2]), color='black')
-plt.step(t1625[0],t1625[1]+1 + (1 - (np.mean(t0534[1]))), label='2M'+str(t1625[3])+' '+str(t1625[2]), color='black')
+plt.step(t1615[0],t1615[1]+1 + (1 - (np.mean(t0534[1]))), label='2M'+str(t1615[3])+' '+str(t1615[2]), color='black')
 plt.step(t0047[0],t0047[1]+0 + (1 - (np.mean(t0534[1]))), label='2M'+str(t0047[3])+' '+str(t0047[2]), color='black')
 
 
@@ -42,23 +42,24 @@ fig = plt.gcf()
 fig.set_size_inches(15, 20)
 
 
-objs = [str(t0253[3]),str(t0534[3]),str(t1935[3]),str(t0027[3]),str(t0241[3]),str(t0117[3]),str(t0045[3]),str(t1551[3]),str(t2154[3]),str(t1625[3]),str(t0047[3])]
+objs = [str(t0253[3]),str(t0534[3]),str(t1935[3]),str(t0027[3]),str(t0241[3]),str(t0117[3]),str(t0045[3]),str(t1551[3]),str(t2154[3]),str(t1615[3]),str(t0047[3])]
 numbers = [0,1,2,3,4,5,6,7,8,9,10]
 
 # for i, j in zip(objs, numbers):
 # 	fig.text(0.6, .5, i, color='black')
 
-plt.annotate('2M'+str(t0253[3]), (1.234,11.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t0534[3]), (1.234,10.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t1935[3]), (1.234,9.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t0027[3]), (1.234,8.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t0241[3]), (1.234,7.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t0117[3]), (1.234,6.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t0045[3]), (1.234,5.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t1551[3]), (1.234,4.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t2154[3]), (1.234,3.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t1625[3]), (1.234,2.25), fontsize=20, color='black')
-plt.annotate('2M'+str(t0047[3]), (1.234,1.25), fontsize=20, color='black')
+
+plt.annotate('2M'+str(t0253[3])+' M7', (1.233,11.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t0534[3])+' M8', (1.233,10.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t1935[3])+' M9', (1.233,9.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t0027[3])+' M9.5', (1.233,8.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t0241[3])+' L0', (1.233,7.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t0117[3])+' L1', (1.233,6.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t0045[3])+' L2', (1.233,5.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t1551[3])+' L2', (1.233,4.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t2154[3])+' L4', (1.233,3.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t1615[3])+' L4', (1.233,2.25), fontsize=20, color='black')
+plt.annotate('2M'+str(t0047[3])+' L7.5', (1.233,1.25), fontsize=20, color='black')
 
 
 plt.title('Order 62', ha='center', size=30)
