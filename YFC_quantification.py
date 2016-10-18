@@ -38,9 +38,14 @@ def yfcq(spec_tar, spec_comp):
 
 # Finds a normalization coefficient	
 	ck = sum((f_tar * f_comp)/(unc_tar * unc_comp))/sum((f_comp * f_comp)/(unc_tar * unc_comp))
-# Creates an array of normalized flux for the comparison object
-	f_comp_norm = f_comp * ck
 	
+	dk = sum((f_tar * f_comp)/((unc_tar)**2 + (unc_comp)**2))/sum((f_comp * f_comp)/((unc_tar)**2 + (unc_comp)**2))
+	
+	bk=sum((f_tar * f_comp))/sum((f_comp * f_comp))
+	
+# Creates an array of normalized flux for the comparison object
+	f_comp_norm_ck = f_comp * ck
+	f_comp_norm_dk = f_comp * dk
 
 # #Plots no shifting on top & just the RV shift on the bottom
 # 
@@ -51,8 +56,8 @@ def yfcq(spec_tar, spec_comp):
 # #Plots the original spectra over each other on top
 # 	plt.plot(w_tar, f_tar, color='black')
 # 	plt.plot(w_comp, f_comp, color='red')
-# #Arbitrarily set y limits for ease of viewing
-# 	plt.subplot(211).set_ylim(0, 1.2)
+# # #Arbitrarily set y limits for ease of viewing
+# # 	plt.subplot(211).set_ylim(0, 1.2)
 # 
 # #Editing the bottom plot
 # 	plt.subplot(212)
@@ -65,26 +70,27 @@ def yfcq(spec_tar, spec_comp):
 # 	plt.subplots_adjust(wspace=0,hspace=0)
 
 
-# Plots just RV shift on top & normalized spectra on the bottom
+#Plots just RV shift on top & normalized spectra on the bottom
 	
-# This plot is made up of two subplots
+#This plot is made up of two subplots
 	plt.subplot(211)
-# Makes the plots share an x-axis
+#Makes the plots share an x-axis
 	plt.gca().axes.get_xaxis().set_visible(False)
-# Plots the original spectra over each other on top
+#Plots the original spectra over each other on top
 	plt.plot(w_tar, f_tar, color='black')
 	plt.plot(shifted_w_comp, f_comp, color='red')
-# Arbitrarily set y limits for ease of viewing
+#Arbitrarily set y limits for ease of viewing
 	plt.subplot(211).set_ylim(0, 1.2)
 
-# Editing the bottom plot
+#Editing the bottom plot
 	plt.subplot(212)
-# Plots the RV shifted spectra over each other
+#Plots the RV shifted spectra over each other
 	plt.plot(shifted_w_tar, f_tar, color='black')
-	plt.plot(shifted_w_comp, f_comp_norm, color='red')
+# 	plt.plot(shifted_w_comp, f_comp_norm_ck, color='red')
+	plt.plot(shifted_w_comp, f_comp_norm_dk, color='red')
 	plt.subplot(212).set_ylim(0, 1.2)
 
-# Makes the subplots appear right on top of one another, with no space in between
+#Makes the subplots appear right on top of one another, with no space in between
 	plt.subplots_adjust(wspace=0,hspace=0)
 	
 # Prints the RVs of the target and comparison objects that you plotted
@@ -93,4 +99,3 @@ def yfcq(spec_tar, spec_comp):
 	
 # Shows the plots
 	plt.show()
-	
