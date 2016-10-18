@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.cm as cm
 import numpy as np 
 from scipy import stats
+from scipy import interpolate
 from operator import sub
 from scipy.interpolate import interp1d
 import BDdb
@@ -36,16 +37,25 @@ def yfcq(spec_tar, spec_comp):
 	shifted_w_tar = (w_tar)*(1.-(rv_tar/2.99792458e5))
 	shifted_w_comp = (w_comp)*(1.-(rv_comp/2.99792458e5))
 
+# Interpolates the flux for the comp object so that when I subtract it from the target flux, I will get a properly calculated residual
+# Remember: once you interpolate, you need to plot the w_tar vs the interpolated flux NOT w_comp vs interpolated flux
+	x = shifted_w_tar
+	xp = shifted_w_comp
+	fp = f_comp
+	f_comp_interp = np.interp(x, xp, fp)
+
 # Finds a normalization coefficient	
 	ck = sum((f_tar * f_comp)/(unc_tar * unc_comp))/sum((f_comp * f_comp)/(unc_tar * unc_comp))
 	
 	dk = sum((f_tar * f_comp)/((unc_tar)**2 + (unc_comp)**2))/sum((f_comp * f_comp)/((unc_tar)**2 + (unc_comp)**2))
+	dk_interp = sum((f_tar * f_comp_interp)/((unc_tar)**2 + (unc_comp)**2))/sum((f_comp_interp * f_comp_interp)/((unc_tar)**2 + (unc_comp)**2))
 	
-	bk=sum((f_tar * f_comp))/sum((f_comp * f_comp))
+	bk = sum((f_tar * f_comp))/sum((f_comp * f_comp))
 	
 # Creates an array of normalized flux for the comparison object
 	f_comp_norm_ck = f_comp * ck
 	f_comp_norm_dk = f_comp * dk
+	f_comp_norm_dk_interp = f_comp_interp * dk
 
 # #Plots no shifting on top & just the RV shift on the bottom
 # 
@@ -70,7 +80,7 @@ def yfcq(spec_tar, spec_comp):
 # 	plt.subplots_adjust(wspace=0,hspace=0)
 
 
-#Plots just RV shift on top & normalized spectra on the bottom
+#Plots just RV shift on top & normalized (interpolated) spectra on the bottom
 	
 #This plot is made up of two subplots
 	plt.subplot(211)
@@ -79,6 +89,7 @@ def yfcq(spec_tar, spec_comp):
 #Plots the original spectra over each other on top
 	plt.plot(w_tar, f_tar, color='black')
 	plt.plot(shifted_w_comp, f_comp, color='red')
+	
 #Arbitrarily set y limits for ease of viewing
 	plt.subplot(211).set_ylim(0, 1.2)
 
@@ -87,7 +98,7 @@ def yfcq(spec_tar, spec_comp):
 #Plots the RV shifted spectra over each other
 	plt.plot(shifted_w_tar, f_tar, color='black')
 # 	plt.plot(shifted_w_comp, f_comp_norm_ck, color='red')
-	plt.plot(shifted_w_comp, f_comp_norm_dk, color='red')
+	plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
 	plt.subplot(212).set_ylim(0, 1.2)
 
 #Makes the subplots appear right on top of one another, with no space in between
