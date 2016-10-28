@@ -57,6 +57,9 @@ def yfcq(spec_tar, spec_comp):
 	f_comp_norm_dk = f_comp * dk
 	f_comp_norm_dk_interp = f_comp_interp * dk
 
+# Subtracting the fluxes to get the residual flux
+	diff = (f_tar) - (f_comp_norm_dk_interp)
+
 # #Plots no shifting on top & just the RV shift on the bottom
 # 
 # #This plot is made up of two subplots
@@ -66,8 +69,8 @@ def yfcq(spec_tar, spec_comp):
 # #Plots the original spectra over each other on top
 # 	plt.plot(w_tar, f_tar, color='black')
 # 	plt.plot(w_comp, f_comp, color='red')
-# # #Arbitrarily set y limits for ease of viewing
-# # 	plt.subplot(211).set_ylim(0, 1.2)
+# #Arbitrarily set y limits for ease of viewing
+# 	plt.subplot(211).set_ylim(0, 1.2)
 # 
 # #Editing the bottom plot
 # 	plt.subplot(212)
@@ -82,27 +85,48 @@ def yfcq(spec_tar, spec_comp):
 
 #Plots just RV shift on top & normalized (interpolated) spectra on the bottom
 	
+# #This plot is made up of two subplots
+# 	plt.subplot(211)
+# #Makes the plots share an x-axis
+# 	plt.gca().axes.get_xaxis().set_visible(False)
+# #Plots the RV shifted spectra over each other on top
+# 	plt.plot(w_tar, f_tar, color='black')
+# 	plt.plot(shifted_w_comp, f_comp, color='red')
+# 	
+# #Arbitrarily set y limits for ease of viewing
+# 	plt.subplot(211).set_ylim(0, 1.2)
+# 
+# #Editing the bottom plot
+# 	plt.subplot(212)
+# #Plots the RV shifted/normalized/interpolated spectra over each other
+# 	plt.plot(shifted_w_tar, f_tar, color='black')
+# # 	plt.plot(shifted_w_comp, f_comp_norm_ck, color='red')
+# 	plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
+# 	plt.subplot(212).set_ylim(0, 1.2)
+# 
+# #Makes the subplots appear right on top of one another, with no space in between
+# 	plt.subplots_adjust(wspace=0,hspace=0)
+	
+	
+#Plots RV shifted, normalized, interpolated on top and bottom. Bottom also has residuals
+
 #This plot is made up of two subplots
 	plt.subplot(211)
 #Makes the plots share an x-axis
 	plt.gca().axes.get_xaxis().set_visible(False)
-#Plots the original spectra over each other on top
-	plt.plot(w_tar, f_tar, color='black')
-	plt.plot(shifted_w_comp, f_comp, color='red')
-	
-#Arbitrarily set y limits for ease of viewing
-	plt.subplot(211).set_ylim(0, 1.2)
+#Plots the RV shifted/normalized/interpolated spectra over each other
+	plt.plot(shifted_w_tar, f_tar, color='black')
+	plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
+	plt.subplot(211).set_ylim(-0.5, 1.2)
 
 #Editing the bottom plot
 	plt.subplot(212)
-#Plots the RV shifted spectra over each other
+#Plots the RV shifted/normalized/interpolated spectra over each other
 	plt.plot(shifted_w_tar, f_tar, color='black')
-# 	plt.plot(shifted_w_comp, f_comp_norm_ck, color='red')
 	plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
-	plt.subplot(212).set_ylim(0, 1.2)
-
-#Makes the subplots appear right on top of one another, with no space in between
-	plt.subplots_adjust(wspace=0,hspace=0)
+	plt.plot(shifted_w_tar, diff, color='gray')
+	plt.subplot(212).set_ylim(-0.5, 1.2)
+	
 	
 # Prints the RVs of the target and comparison objects that you plotted
 	print 'rv_tar=',rv_tar
