@@ -59,6 +59,9 @@ def yfcq(spec_tar, spec_comp):
 
 # Subtracting the fluxes to get the residual flux
 	diff = (f_tar) - (f_comp_norm_dk_interp)
+	
+# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
+	rms = ((np.sum(diff[4:1020]**2))/(len(diff[4:1020])))**(0.5)
 
 # #Plots no shifting on top & just the RV shift on the bottom
 # 
@@ -111,26 +114,35 @@ def yfcq(spec_tar, spec_comp):
 #Plots RV shifted, normalized, interpolated on top and bottom. Bottom also has residuals
 
 #This plot is made up of two subplots
-	plt.subplot(211)
+	plt.subplot(311)
 #Makes the plots share an x-axis
 	plt.gca().axes.get_xaxis().set_visible(False)
 #Plots the RV shifted/normalized/interpolated spectra over each other
 	plt.plot(shifted_w_tar, f_tar, color='black')
 	plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
-	plt.subplot(211).set_ylim(-0.5, 1.2)
+	plt.subplot(311).set_ylim(-0.5, 1.2)
 
 #Editing the bottom plot
-	plt.subplot(212)
-#Plots the RV shifted/normalized/interpolated spectra over each other
+	plt.subplot(312)
+#Plots the RV shifted/normalized/interpolated spectra over each other + absolute value of residuals
 	plt.plot(shifted_w_tar, f_tar, color='black')
 	plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
+# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
+	plt.subplot(312).set_ylim(0, 1.2)
+	
+#Plots residuals
+	plt.subplot(313)
 	plt.plot(shifted_w_tar, diff, color='gray')
-	plt.subplot(212).set_ylim(-0.5, 1.2)
+	plt.plot(shifted_w_tar, np.zeros(1024))
+	plt.subplot(313).set_ylim(-0.5, 0.5)
 	
 	
-# Prints the RVs of the target and comparison objects that you plotted
-	print 'rv_tar=',rv_tar
-	print 'rv,comp=',rv_comp
-	
+# #Prints the RVs of the target and comparison objects that you plotted
+# 	print 'rv_tar=',rv_tar
+# 	print 'rv,comp=',rv_comp
+
+#	Print the calculated RMS
+	print 'RMS=', rms
+		
 # Shows the plots
 	plt.show()
