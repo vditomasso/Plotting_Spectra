@@ -12,10 +12,16 @@ import BDdb
 db = BDdb.get_db('/Users/victoriaditomasso/Desktop/BDNYCdeprecated.db')
 
 # The inputs are the spectral_id for the target object and the comparison object
-def yfcq(spec_tar, spec_comp):
+def yfcq(tar_source_id, spec_order):
 
 # This clears the figure, useful when saving the plots
 	plt.clf()
+	
+data_tar = db.query.execute("select sources.id, sources.shortname, spectra.wavelength, spectra.flux, spectra.unc, radial_velocities.radial_velocity from sources join spectra on sources.id=spectra.source_id join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.source_id={} and spectra.wavelength_order={}".format(tar_source_id, spec_order)).fetchall()
+tar_spectype = db.query.execute("select spectral_types.spectral_type, spectral_types.gravity from spectral_types where spectral_types.source_id={} and (spectral_types.regime='OPT' or spectral_types.regime='IR')".format(tar_source_id)).fetchall()
+
+data_comp = db.query.execute("select sources.id, sources.shortname, spectra.wavelength, spectra.flux, spectra.unc, spectra.id, radial_velocities.radial_velocity from sources join spectra on sources.id=spectra.source_id join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.wavelength_order=62 and exists (select radial_velocities.radial_velocity from spectra join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.instrument_id=9 and spectra.telescope_id=9)".format(spec_order)).fetchall()
+tar_spectype = #need to make this give me the spec_id of the comparison (so that I can group by it later) and give it all the same wheres as the previous query so that I get spectral types for all the objects that I pull spectra for in the previous query
 	
 # Gets the wavelength, flux, shortname, spectral type, RV, spectra_unc for the objects corresponding to the two spectral_ids
 	data_tar = db.query.execute("select spectra.wavelength, spectra.flux, sources.shortname, spectral_types.spectral_type, radial_velocities.radial_velocity, spectra.unc from spectra join sources on spectra.source_id=sources.id join spectral_types on spectra.source_id=spectral_types.source_id join radial_velocities on sources.id=radial_velocities.source_id where spectra.id={}".format(spec_tar)).fetchone()
