@@ -1,3 +1,4 @@
+#yfcq_auto
 import math
 import matplotlib.pyplot as plt
 import matplotlib
