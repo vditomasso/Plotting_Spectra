@@ -57,7 +57,7 @@ def yfcq(tar_source_id, spec_order):
 		dk = sum((f_tar * f_comp)/((unc_tar)**2 + (unc_comp)**2))/sum((f_comp * f_comp)/((unc_tar)**2 + (unc_comp)**2))
 	
 	# Creates an array of normalized flux for the comparison object
-		f_comp_norm_ck = f_comp * ck
+# 		f_comp_norm_ck = f_comp * ck
 		f_comp_norm_dk = f_comp * dk
 		f_comp_norm_dk_interp = f_comp_interp * dk
 
@@ -65,7 +65,7 @@ def yfcq(tar_source_id, spec_order):
 		diff = (f_tar) - (f_comp_norm_dk_interp)
 	
 	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
-		rms = ((np.sum(diff[4:1020]**2))/(len(diff[4:1020])))**(0.5)
+		rms = ((np.sum(diff[10:1000]**2))/(len(diff[10:1000])))**(0.5)
 	
 	#Plots RV shifted, normalized, interpolated on top and bottom. Bottom also has residuals
 
@@ -74,21 +74,21 @@ def yfcq(tar_source_id, spec_order):
 	#Makes the plots share an x-axis
 		plt.gca().axes.get_xaxis().set_visible(False)
 	#Plots the RV shifted/normalized/interpolated spectra over each other
-		plt.plot(shifted_w_tar, f_tar, color='black')
-		plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
+		plt.plot(shifted_w_tar[10:1000], f_tar[10:1000], color='black')
+		plt.plot(shifted_w_tar[10:1000], f_comp_norm_dk_interp[10:1000], color='red')
 		plt.subplot(311).set_ylim(-0.5, 1.2)
 
 	#Editing the bottom plot
 		plt.subplot(312)
 	#Plots the RV shifted/normalized/interpolated spectra over each other + absolute value of residuals
-		plt.plot(shifted_w_tar, f_tar, color='black')
-		plt.plot(shifted_w_tar, f_comp_norm_dk_interp, color='red')
+		plt.plot(shifted_w_tar[10:1000], f_tar[10:1000], color='black')
+		plt.plot(shifted_w_tar[10:1000], f_comp_norm_dk_interp[10:1000], color='red')
 	# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
 		plt.subplot(312).set_ylim(0, 1.2)
 	
 	#Plots residuals
 		plt.subplot(313)
-		plt.plot(shifted_w_tar, diff, color='gray')
+		plt.plot(shifted_w_tar[10:1000], diff[10:1000], color='gray')
 # 		plt.plot(shifted_w_tar, np.zeros(1024))
 		plt.subplot(313).set_ylim(-0.5, 0.5)
 	
