@@ -62,6 +62,8 @@ def yfcq(spec_tar, spec_comp):
 	
 # Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
 	rms = ((np.sum(diff[4:1020]**2))/(len(diff[4:1020])))**(0.5)
+	chisq_b4div = np.sum((f_tar-f_comp_norm_dk_interp)**2/((unc_tar**2)+(unc_comp**2)))
+	chisq = chisq_b4div/len(f_tar)
 
 # #Plots no shifting on top & just the RV shift on the bottom
 # 
@@ -143,6 +145,7 @@ def yfcq(spec_tar, spec_comp):
 
 #	Print the calculated RMS
 	print 'RMS=', rms
+	print 'chisq=', chisq
 		
 # Shows the plots
 	plt.show()
