@@ -20,7 +20,6 @@ def yfcq(tar_source_id, spec_order):
 	data_tar = db.query.execute("select sources.id, sources.shortname, spectra.wavelength, spectra.flux, spectra.unc, radial_velocities.radial_velocity from sources join spectra on sources.id=spectra.source_id join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.source_id={} and spectra.wavelength_order={}".format(tar_source_id, spec_order)).fetchall()
 	tar_spectype = db.query.execute("select spectral_types.spectral_type, spectral_types.gravity from spectral_types where spectral_types.source_id={} and (spectral_types.regime='OPT' or spectral_types.regime='IR')".format(tar_source_id)).fetchall()
 
-
 	data_comp = db.query.execute("select sources.id, sources.shortname, spectra.wavelength, spectra.flux, spectra.unc, spectra.id, radial_velocities.radial_velocity from sources join spectra on sources.id=spectra.source_id join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.wavelength_order={} and exists (select radial_velocities.radial_velocity from spectra join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.instrument_id=9 and spectra.telescope_id=9) and exists(select radial_velocities.radial_velocity_unc)".format(spec_order)).fetchall()
 # 	tar_spectype = #need to make this give me the spec_id of the comparison (so that I can group by it later) and give it all the same wheres as the previous query so that I get spectral types for all the objects that I pull spectra for in the previous query
 
@@ -67,6 +66,9 @@ def yfcq(tar_source_id, spec_order):
 	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
 		rms = ((np.sum(diff[10:1000]**2))/(len(diff[10:1000])))**(0.5)
 	
+	#Sets the last flux point that will be used in quantification calculation/will be plotted
+		l=1000
+	
 	#Plots RV shifted, normalized, interpolated on top and bottom. Bottom also has residuals
 
 	#This plot is made up of two subplots
@@ -74,21 +76,21 @@ def yfcq(tar_source_id, spec_order):
 	#Makes the plots share an x-axis
 		plt.gca().axes.get_xaxis().set_visible(False)
 	#Plots the RV shifted/normalized/interpolated spectra over each other
-		plt.plot(shifted_w_tar[10:1000], f_tar[10:1000], color='black')
-		plt.plot(shifted_w_tar[10:1000], f_comp_norm_dk_interp[10:1000], color='red')
+		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
+		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
 		plt.subplot(311).set_ylim(-0.5, 1.2)
 
 	#Editing the bottom plot
 		plt.subplot(312)
 	#Plots the RV shifted/normalized/interpolated spectra over each other + absolute value of residuals
-		plt.plot(shifted_w_tar[10:1000], f_tar[10:1000], color='black')
-		plt.plot(shifted_w_tar[10:1000], f_comp_norm_dk_interp[10:1000], color='red')
+		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
+		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
 	# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
 		plt.subplot(312).set_ylim(0, 1.2)
 	
 	#Plots residuals
 		plt.subplot(313)
-		plt.plot(shifted_w_tar[10:1000], diff[10:1000], color='gray')
+		plt.plot(shifted_w_tar[:l], diff[:l], color='gray')
 # 		plt.plot(shifted_w_tar, np.zeros(1024))
 		plt.subplot(313).set_ylim(-0.5, 0.5)
 	
