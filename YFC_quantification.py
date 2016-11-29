@@ -68,9 +68,10 @@ def yfcq(tar_source_id, spec_order):
 
 	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
 		rms = ((np.sum(diff[10:l]**2))/(len(diff[10:l])))**(0.5)
+	# Calculates the chisq value, you divide by the degrees of freedom to get a value near 1
+		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]**2)+(unc_comp[:l]**2)))
+		chisq = chisq_b4div/len(f_tar[:l])
 	
-	#Plots RV shifted, normalized, interpolated on top and bottom. Bottom also has residuals
-
 	#This plot is made up of two subplots
 		plt.subplot(311)
 	#Makes the plots share an x-axis
@@ -78,15 +79,15 @@ def yfcq(tar_source_id, spec_order):
 	#Plots the RV shifted/normalized/interpolated spectra over each other
 		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
 		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
-		plt.subplot(311).set_ylim(-0.5, 1.2)
+		plt.subplot(311).set_ylim(0, 1.2)
 
 	#Editing the bottom plot
 		plt.subplot(312)
-	#Plots the RV shifted/normalized/interpolated spectra over each other + absolute value of residuals
-		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
-		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
+	#Plots the uncertainties of the two spectra
+		plt.plot(shifted_w_tar[:l], unc_tar[:l], color='black')
+		plt.plot(shifted_w_tar[:l], unc_comp[:l], color='red')
 	# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
-		plt.subplot(312).set_ylim(0, 1.2)
+	# 	plt.subplot(312).set_ylim(0, 1.2)
 	
 	#Plots residuals
 		plt.subplot(313)
@@ -99,7 +100,7 @@ def yfcq(tar_source_id, spec_order):
 	# 	print 'rv_tar=',rv_tar
 	# 	print 'rv,comp=',rv_comp
 	#	Print the calculated RMS
-		print 'source_id=',data_comp[i][0],'shortname=',data_comp[i][1],'wavelength_order=',spec_order,'spec_id=',data_comp[i][5],'RMS=', rms
+		print 'source_id=',data_comp[i][0],'shortname=',data_comp[i][1],'wavelength_order=',spec_order,'spec_id=',data_comp[i][5],'RMS=', rms, 'chisq=', chisq
 		
 	# Shows the plots
 		plt.show()
