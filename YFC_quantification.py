@@ -117,29 +117,28 @@ def yfcq(spec_tar, spec_comp):
 	
 	
 #Plots RV shifted, normalized, interpolated on top and bottom. Bottom also has residuals
+#This plot is made up of two subplots
+	plt.subplot(311)
+#Makes the plots share an x-axis
+	plt.gca().axes.get_xaxis().set_visible(False)
+#Plots the RV shifted/normalized/interpolated spectra over each other
+	plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
+	plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
+	plt.subplot(311).set_ylim(-0.5, 1.2)
 
-	#This plot is made up of two subplots
-		plt.subplot(311)
-	#Makes the plots share an x-axis
-		plt.gca().axes.get_xaxis().set_visible(False)
-	#Plots the RV shifted/normalized/interpolated spectra over each other
-		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
-		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
-		plt.subplot(311).set_ylim(-0.5, 1.2)
+#Editing the bottom plot
+	plt.subplot(312)
+#Plots the RV shifted/normalized/interpolated spectra over each other + absolute value of residuals
+	plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
+	plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
+# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
+	plt.subplot(312).set_ylim(0, 1.2)
 
-	#Editing the bottom plot
-		plt.subplot(312)
-	#Plots the RV shifted/normalized/interpolated spectra over each other + absolute value of residuals
-		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
-		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
-	# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
-		plt.subplot(312).set_ylim(0, 1.2)
-	
-	#Plots residuals
-		plt.subplot(313)
-		plt.plot(shifted_w_tar[:l], diff[:l], color='gray')
-# 		plt.plot(shifted_w_tar, np.zeros(1024))
-		plt.subplot(313).set_ylim(-0.5, 0.5)
+#Plots residuals
+	plt.subplot(313)
+	plt.plot(shifted_w_tar[:l], diff[:l], color='gray')
+	plt.plot(shifted_w_tar, np.zeros(1024))
+	plt.subplot(313).set_ylim(-0.5, 0.5)
 	
 	
 # #Prints the RVs of the target and comparison objects that you plotted
