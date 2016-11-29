@@ -62,12 +62,12 @@ def yfcq(tar_source_id, spec_order):
 
 	# Subtracting the fluxes to get the residual flux
 		diff = (f_tar) - (f_comp_norm_dk_interp)
-	
-	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
-		rms = ((np.sum(diff[10:1000]**2))/(len(diff[10:1000])))**(0.5)
-	
+
 	#Sets the last flux point that will be used in quantification calculation/will be plotted
 		l=1000
+
+	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
+		rms = ((np.sum(diff[10:l]**2))/(len(diff[10:l])))**(0.5)
 	
 	#Plots RV shifted, normalized, interpolated on top and bottom. Bottom also has residuals
 
