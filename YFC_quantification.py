@@ -66,6 +66,12 @@ def yfcq(tar_source_id, spec_order):
 	#Sets the last flux point that will be used in quantification calculation/will be plotted
 		l=1000
 
+	#Checking if unc arrays are actually snrs and, if they are, converting them by doing 1/unc
+		unc=np.asarray(unc_comp)
+		avg_unc = np.sum(unc)/len(unc)
+		if avg_unc > 4.0:
+			unc_comp = 1.0/unc
+
 	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
 		rms = ((np.sum(diff[10:l]**2))/(len(diff[10:l])))**(0.5)
 	# Calculates the chisq value, you divide by the degrees of freedom to get a value near 1
