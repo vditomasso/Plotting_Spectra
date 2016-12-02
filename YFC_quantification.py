@@ -9,37 +9,43 @@ from scipy import interpolate
 from operator import sub
 from scipy.interpolate import interp1d
 import BDdb
+import pandas as pd
 db = BDdb.get_db('/Users/victoriaditomasso/Desktop/BDNYCdeprecated.db')
 
-# The inputs are the spectral_id for the target object and the comparison object
-def yfcq(tar_source_id, spec_order):
+# The inputs are the target source id, the spec order being compared and the path to the text file with the comparison sample (has to be tab delimited)
+def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 
 # This clears the figure, useful when saving the plots
 	plt.clf()
 	
 	data_tar = db.query.execute("select sources.id, sources.shortname, spectra.wavelength, spectra.flux, spectra.unc, radial_velocities.radial_velocity from sources join spectra on sources.id=spectra.source_id join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.source_id={} and spectra.wavelength_order={}".format(tar_source_id, spec_order)).fetchall()
 	tar_spectype = db.query.execute("select spectral_types.spectral_type, spectral_types.gravity from spectral_types where spectral_types.source_id={} and (spectral_types.regime='OPT' or spectral_types.regime='IR')".format(tar_source_id)).fetchall()
+	tar_opt_spec_type = db.query.execute("select spectral_types.spectral_type, spectral_types.gravity from spectral_types where spectral_types.source_id={} and spectral_types.regime='OPT'".format(tar_source_id)).fetchone()
+	ir_spec_type = db.query.execute("select spectral_types.spectral_type, spectral_types.gravity from spectral_types where spectral_types.source_id={} and spectral_types.regime='IR'".format(tar_source_id)).fetchone()
 
-	data_comp = db.query.execute("select sources.id, sources.shortname, spectra.wavelength, spectra.flux, spectra.unc, spectra.id, radial_velocities.radial_velocity from sources join spectra on sources.id=spectra.source_id join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.wavelength_order={} and exists (select radial_velocities.radial_velocity from spectra join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.instrument_id=9 and spectra.telescope_id=9) and exists(select radial_velocities.radial_velocity_unc)".format(spec_order)).fetchall()
-# 	tar_spectype = #need to make this give me the spec_id of the comparison (so that I can group by it later) and give it all the same wheres as the previous query so that I get spectral types for all the objects that I pull spectra for in the previous query
-
-	for i in range(len(data_comp)) :
-	# #Gets the wavelength, flux, shortname, spectral type, RV, spectra_unc for the objects corresponding to the two spectral_ids
+	df=pd.read_csv(path_to_comp_sample_dataframe,sep='\t')
+	
+	for i, row in df.iterrows() :
+	
+#Gets the wavelength, flux, shortname, spectral type, RV, spectra_unc for the objects corresponding to the two spectral_ids
 	# 	data_tar = db.query.execute("select spectra.wavelength, spectra.flux, sources.shortname, spectral_types.spectral_type, radial_velocities.radial_velocity, spectra.unc from spectra join sources on spectra.source_id=sources.id join spectral_types on spectra.source_id=spectral_types.source_id join radial_velocities on sources.id=radial_velocities.source_id where spectra.id={}".format(spec_tar)).fetchone()
 	# 	data_comp = db.query.execute("select spectra.wavelength, spectra.flux, sources.shortname, spectral_types.spectral_type, radial_velocities.radial_velocity, spectra.unc from spectra join sources on spectra.source_id=sources.id join spectral_types on spectra.source_id=spectral_types.source_id join radial_velocities on sources.id=radial_velocities.source_id where spectra.id={}".format(spec_comp)).fetchone()
+
+#Gets the wavelength, flux, and uncertainty for the spec_ids listed in comp_sample
+		data_comp = db.query.execute("select spectra.wavelength, spectra.flux, spectra.unc from spectra where spectra.id={}".format(row['spec_id'])).fetchall()
 
 	# Separates out the wavelength array, flux array, RV and uncertainty as a float for the two spectra	
 		w_tar = np.asarray(data_tar[0][2])
 		f_tar = np.asarray(data_tar[0][3])
 	
-		w_comp = np.asarray(data_comp[i][2])
-		f_comp = np.asarray(data_comp[i][3])
+		w_comp = np.asarray(data_comp[0][0])
+		f_comp = np.asarray(data_comp[0][1])
 	
 		rv_tar = data_tar[0][5]
-		rv_comp = data_comp[i][6]
+		rv_comp = row['rv']
 	
 		unc_tar = data_tar[0][4]
-		unc_comp = data_comp[i][4]
+		unc_comp = data_comp[0][2]
 	
 	# Shifts the two spectra based on their RVs
 		shifted_w_tar = (w_tar)*(1.-(rv_tar/2.99792458e5))
@@ -94,7 +100,7 @@ def yfcq(tar_source_id, spec_order):
 		plt.plot(shifted_w_tar[:l], unc_comp[:l], color='red')
 	# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
 	# 	plt.subplot(312).set_ylim(0, 1.2)
-	
+	 
 	#Plots residuals
 		plt.subplot(313)
 		plt.plot(shifted_w_tar[:l], diff[:l], color='gray')
@@ -106,7 +112,7 @@ def yfcq(tar_source_id, spec_order):
 	# 	print 'rv_tar=',rv_tar
 	# 	print 'rv,comp=',rv_comp
 	#	Print the calculated RMS
-		print 'source_id=',data_comp[i][0],'shortname=',data_comp[i][1],'wavelength_order=',spec_order,'spec_id=',data_comp[i][5],'RMS=', rms, 'chisq=', chisq
+		print 'source_id=',row['source_id'],'shortname=',row['shortname'],'wavelength_order=',row['order'],'spec_id=',row['spec_id'],'RMS=', rms, 'chisq=', chisq
 		
 	# Shows the plots
 		plt.show()
