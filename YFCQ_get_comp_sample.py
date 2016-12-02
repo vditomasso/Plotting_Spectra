@@ -15,9 +15,6 @@ db = BDdb.get_db('/Users/victoriaditomasso/Desktop/BDNYCdeprecated.db')
 # Queries for source id, shortname, RV, order, and spectra ID for all order 61 spectra with uncertainties whose objects have RVs
 data=db.query.execute("select sources.id, sources.shortname, radial_velocities.radial_velocity, spectra.wavelength_order, spectra.id from sources join spectra on sources.id=spectra.source_id join radial_velocities on spectra.source_id=radial_velocities.source_id where spectra.wavelength_order=61 and length(spectra.unc)>0").fetchall()
 
-print "data before =", data[0]
-print "type data[0] =", type(data[0])
-
 comp_data=[]
 
 for i in range(len(data)):
@@ -60,6 +57,4 @@ for i in range(len(comp_data)):
 
 d = {'source_id' : source_ids, 'shortname' : shortnames, 'rv' : rvs, 'order' : orders, 'opt_spec_type' : opt_spec_types, 'opt_gravity' : opt_gravitys, 'ir_spec_type' : ir_spec_types, 'ir_gravity' : ir_gravitys, 'spec_id' : spec_ids}
 df = pd.DataFrame(d)
-# df.to_excel('dataframe.xlsx', sheet_name='Sheet1')
-# df.to_csv('dataframe')
-df.to_excel('dataframe.xlsx')
+df.to_csv('comp_sample_order_61.txt',sep='\t')
