@@ -66,7 +66,7 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 		if avg_unc > 4.0:
 			unc_comp = 1.0/unc
 		if avg_unc == 1.0:
-			print 'UNC AVG = 1','source_id=',row['source_id'],'shortname=',row['shortname'],'wavelength_order=',row['order'],'spec_id=',row['spec_id'],'RMS=', rms, 'chisq=', chisq
+			print 'UNC AVG = 1:'
 
 	# Interpolate the unc
 		w = shifted_w_tar
@@ -91,7 +91,7 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
 		rms = ((np.sum(diff[10:l]**2))/(len(diff[10:l])))**(0.5)
 	# Calculates the chisq value, you divide by the degrees of freedom to get a value near 1
-		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]**2)+(unc_comp_interp[:l]**2)))
+		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]+unc_comp_interp[:l])**2))
 		chisq = chisq_b4div/len(f_tar[:l])
 	
 	#This plot is made up of two subplots
@@ -138,4 +138,4 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 		
 	df['chisq'] = chisqs
 	
-	df.to_csv(str(data_tar[0][1])+'_'+str(spec_order)+'_chisq_w_interp_unc_comp.txt',sep='\t')
+	df.to_csv(str(data_tar[0][1])+'_'+str(spec_order)+'_chisq_w_uncsaddedthensq_uncinterp_unc_comp_badcompremoved.txt',sep='\t')
