@@ -25,6 +25,8 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 
 	df=pd.read_csv(path_to_comp_sample_dataframe,sep='\t')
 	
+	chisqs=[]
+	
 	for i, row in df.iterrows() :
 	
 #Gets the wavelength, flux, shortname, spectral type, RV, spectra_unc for the objects corresponding to the two spectral_ids
@@ -58,8 +60,22 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 		fp = f_comp
 		f_comp_interp = np.interp(x, xp, fp)
 
+	#Checking if unc arrays are actually snrs and, if they are, converting them by doing 1/unc
+		unc=np.asarray(unc_comp)
+		avg_unc = np.sum(unc)/len(unc)
+		if avg_unc > 4.0:
+			unc_comp = 1.0/unc
+		if avg_unc == 1.0:
+			print 'UNC AVG = 1','source_id=',row['source_id'],'shortname=',row['shortname'],'wavelength_order=',row['order'],'spec_id=',row['spec_id'],'RMS=', rms, 'chisq=', chisq
+
+	# Interpolate the unc
+		w = shifted_w_tar
+		wp = shifted_w_comp
+		up = unc_comp
+		unc_comp_interp = np.interp(w, wp, up)
+
 	# Finds a normalization coefficient	
-		dk = sum((f_tar * f_comp)/((unc_tar)**2 + (unc_comp)**2))/sum((f_comp * f_comp)/((unc_tar)**2 + (unc_comp)**2))
+		dk = sum((f_tar * f_comp)/((unc_tar)**2 + (unc_comp_interp)**2))/sum((f_comp * f_comp)/((unc_tar)**2 + (unc_comp_interp)**2))
 	
 	# Creates an array of normalized flux for the comparison object
 # 		f_comp_norm_ck = f_comp * ck
@@ -72,16 +88,10 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	#Sets the last flux point that will be used in quantification calculation/will be plotted
 		l=1000
 
-	#Checking if unc arrays are actually snrs and, if they are, converting them by doing 1/unc
-		unc=np.asarray(unc_comp)
-		avg_unc = np.sum(unc)/len(unc)
-		if avg_unc > 4.0:
-			unc_comp = 1.0/unc
-
 	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
 		rms = ((np.sum(diff[10:l]**2))/(len(diff[10:l])))**(0.5)
 	# Calculates the chisq value, you divide by the degrees of freedom to get a value near 1
-		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]**2)+(unc_comp[:l]**2)))
+		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]**2)+(unc_comp_interp[:l]**2)))
 		chisq = chisq_b4div/len(f_tar[:l])
 	
 	#This plot is made up of two subplots
@@ -93,13 +103,20 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
 		plt.subplot(311).set_ylim(0, 1.2)
 
-	#Editing the bottom plot
+	#Editing the middle plot
 		plt.subplot(312)
 	#Plots the uncertainties of the two spectra
-		plt.plot(shifted_w_tar[:l], unc_tar[:l], color='black')
-		plt.plot(shifted_w_tar[:l], unc_comp[:l], color='red')
+# 		plt.plot(shifted_w_tar[:l], unc_tar[:l], color='black')
+# 		plt.plot(shifted_w_tar[:l], unc_comp_interp[:l], color='red')
 	# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
 	# 	plt.subplot(312).set_ylim(0, 1.2)
+
+	#Plots the spectra with uncertainties as shaded area
+		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
+		plt.fill_between(shifted_w_tar[:l], np.asarray(f_tar[:l]-unc_tar[:l]), np.asarray(f_tar[:l]+unc_tar[:l]), color='grey', alpha=0.3)
+		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
+		plt.fill_between(shifted_w_tar[:l], np.asarray(f_comp_norm_dk_interp[:l]-unc_comp_interp[:l]), np.asarray(f_comp_norm_dk_interp[:l]+unc_comp_interp[:l]), color='red', alpha = 0.3)
+		plt.subplot(312).set_ylim(0, 1.2)
 	 
 	#Plots residuals
 		plt.subplot(313)
@@ -115,4 +132,10 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 		print 'source_id=',row['source_id'],'shortname=',row['shortname'],'wavelength_order=',row['order'],'spec_id=',row['spec_id'],'RMS=', rms, 'chisq=', chisq
 		
 	# Shows the plots
-		plt.show()
+# 		plt.show()
+		
+		chisqs.append(chisq)
+		
+	df['chisq'] = chisqs
+	
+	df.to_csv(str(data_tar[0][1])+'_'+str(spec_order)+'_chisq_w_interp_unc_comp.txt',sep='\t')
