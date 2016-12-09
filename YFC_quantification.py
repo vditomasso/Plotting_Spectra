@@ -93,6 +93,8 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	# Calculates the chisq value, you divide by the degrees of freedom to get a value near 1
 		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]+unc_comp_interp[:l])**2))
 		chisq = chisq_b4div/len(f_tar[:l])
+# 	# Chisq without uncertainties
+# 		chisq_wo = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2)
 	
 	#This plot is made up of two subplots
 		plt.subplot(311)
@@ -138,4 +140,4 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 		
 	df['chisq'] = chisqs
 	
-	df.to_csv(str(data_tar[0][1])+'_'+str(spec_order)+'_chisq_w_uncsaddedthensq_uncinterp_unc_comp_badcompremoved.txt',sep='\t')
+	df.to_csv(str(data_tar[0][1])+'_'+str(spec_order)+'_chisq_bad_removed.txt',sep='\t')
