@@ -29,6 +29,8 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	
 	for i, row in df.iterrows() :
 	
+		chisq_indivs = []
+	
 #Gets the wavelength, flux, shortname, spectral type, RV, spectra_unc for the objects corresponding to the two spectral_ids
 	# 	data_tar = db.query.execute("select spectra.wavelength, spectra.flux, sources.shortname, spectral_types.spectral_type, radial_velocities.radial_velocity, spectra.unc from spectra join sources on spectra.source_id=sources.id join spectral_types on spectra.source_id=spectral_types.source_id join radial_velocities on sources.id=radial_velocities.source_id where spectra.id={}".format(spec_tar)).fetchone()
 	# 	data_comp = db.query.execute("select spectra.wavelength, spectra.flux, sources.shortname, spectral_types.spectral_type, radial_velocities.radial_velocity, spectra.unc from spectra join sources on spectra.source_id=sources.id join spectral_types on spectra.source_id=spectral_types.source_id join radial_velocities on sources.id=radial_velocities.source_id where spectra.id={}".format(spec_comp)).fetchone()
@@ -93,6 +95,11 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	# Calculates the chisq value, you divide by the degrees of freedom to get a value near 1
 		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]+unc_comp_interp[:l])**2))
 		chisq = chisq_b4div/len(f_tar[:l])
+		
+		for j in range(len(f_tar[:l])):
+			chisq_indiv = ((f_tar[j]-f_comp_norm_dk_interp[j])**2/((unc_tar[j]+unc_comp_interp[j])**2))/(len(f_tar[:l]))
+			chisq_indivs.append(chisq_indiv)
+		
 # 	# Chisq without uncertainties
 # 		chisq_wo = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2)
 	
@@ -122,9 +129,10 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	 
 	#Plots residuals
 		plt.subplot(313)
-		plt.plot(shifted_w_tar[:l], diff[:l], color='gray')
-# 		plt.plot(shifted_w_tar, np.zeros(1024))
-		plt.subplot(313).set_ylim(-0.5, 0.5)
+		plt.plot(shifted_w_tar[:l], chisq_indivs, color='gray')
+		plt.plot(shifted_w_tar, np.zeros(1024))
+		plt.subplot(313).set_ylim(-0.2, 0.2)
+# 		plt.annotate(label, xytext=()
 	
 	
 	# #Prints the RVs of the target and comparison objects that you plotted
@@ -136,7 +144,17 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	# Shows the plots
 # 		plt.show()
 		
+		
+# 		print row['shortname']
+		
+		label = '/Users/victoriaditomasso/Plotting_Spectra/'+str(row['shortname'])+'_'+str(chisq)+'.png'
+		print label
+		print type(label)
 		chisqs.append(chisq)
+# 		plt.savefig(label)
+
+# 		print chisq_indivs
+# 		print type(chisq_indivs)
 		
 	df['chisq'] = chisqs
 	
