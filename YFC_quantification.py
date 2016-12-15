@@ -87,50 +87,51 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 	# Subtracting the fluxes to get the residual flux
 		diff = (f_tar) - (f_comp_norm_dk_interp)
 
-	#Sets the last flux point that will be used in quantification calculation/will be plotted
+	#Sets the first and last flux point that will be used in quantification calculation/will be plotted
+		f=50
 		l=1000
 
 	# Calculates the root mean square of the residuals for a quantification of the fit, skipping the first 4 and last 4 data points (because the spectra can get weird at te ends)
-		rms = ((np.sum(diff[10:l]**2))/(len(diff[10:l])))**(0.5)
+		rms = ((np.sum(diff[f:l]**2))/(len(diff[f:l])))**(0.5)
 	# Calculates the chisq value, you divide by the degrees of freedom to get a value near 1
-		chisq_b4div = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2/((unc_tar[:l]+unc_comp_interp[:l])**2))
-		chisq = chisq_b4div/len(f_tar[:l])
+		chisq_b4div = np.sum((f_tar[f:l]-f_comp_norm_dk_interp[f:l])**2/((unc_tar[f:l]+unc_comp_interp[f:l])**2))
+		chisq = chisq_b4div/len(f_tar[f:l])
 		
-		for j in range(len(f_tar[:l])):
-			chisq_indiv = ((f_tar[j]-f_comp_norm_dk_interp[j])**2/((unc_tar[j]+unc_comp_interp[j])**2))/(len(f_tar[:l]))
+		for j in range(len(f_tar)):
+			chisq_indiv = ((f_tar[j]-f_comp_norm_dk_interp[j])**2/((unc_tar[j]+unc_comp_interp[j])**2))/(len(f_tar[f:l]))
 			chisq_indivs.append(chisq_indiv)
 		
 # 	# Chisq without uncertainties
-# 		chisq_wo = np.sum((f_tar[:l]-f_comp_norm_dk_interp[:l])**2)
+# 		chisq_wo = np.sum((f_tar[f:l]-f_comp_norm_dk_interp[f:l])**2)
 	
 	#This plot is made up of two subplots
 		plt.subplot(311)
 	#Makes the plots share an x-axis
 		plt.gca().axes.get_xaxis().set_visible(False)
 	#Plots the RV shifted/normalized/interpolated spectra over each other
-		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
-		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
+		plt.plot(shifted_w_tar[f:l], f_tar[f:l], color='black')
+		plt.plot(shifted_w_tar[f:l], f_comp_norm_dk_interp[f:l], color='red')
 		plt.subplot(311).set_ylim(0, 1.2)
 
 	#Editing the middle plot
 		plt.subplot(312)
 	#Plots the uncertainties of the two spectra
-# 		plt.plot(shifted_w_tar[:l], unc_tar[:l], color='black')
-# 		plt.plot(shifted_w_tar[:l], unc_comp_interp[:l], color='red')
+# 		plt.plot(shifted_w_tar[f:l], unc_tar[f:l], color='black')
+# 		plt.plot(shifted_w_tar[f:l], unc_comp_interp[f:l], color='red')
 	# 	plt.plot(shifted_w_tar, abs(diff), color='gray')
 	# 	plt.subplot(312).set_ylim(0, 1.2)
 
 	#Plots the spectra with uncertainties as shaded area
-		plt.plot(shifted_w_tar[:l], f_tar[:l], color='black')
-		plt.fill_between(shifted_w_tar[:l], np.asarray(f_tar[:l]-unc_tar[:l]), np.asarray(f_tar[:l]+unc_tar[:l]), color='grey', alpha=0.3)
-		plt.plot(shifted_w_tar[:l], f_comp_norm_dk_interp[:l], color='red')
-		plt.fill_between(shifted_w_tar[:l], np.asarray(f_comp_norm_dk_interp[:l]-unc_comp_interp[:l]), np.asarray(f_comp_norm_dk_interp[:l]+unc_comp_interp[:l]), color='red', alpha = 0.3)
+		plt.plot(shifted_w_tar[f:l], f_tar[f:l], color='black')
+		plt.fill_between(shifted_w_tar[f:l], np.asarray(f_tar[f:l]-unc_tar[f:l]), np.asarray(f_tar[f:l]+unc_tar[f:l]), color='grey', alpha=0.3)
+		plt.plot(shifted_w_tar[f:l], f_comp_norm_dk_interp[f:l], color='red')
+		plt.fill_between(shifted_w_tar[f:l], np.asarray(f_comp_norm_dk_interp[f:l]-unc_comp_interp[f:l]), np.asarray(f_comp_norm_dk_interp[f:l]+unc_comp_interp[f:l]), color='red', alpha = 0.3)
 		plt.subplot(312).set_ylim(0, 1.2)
 	 
 	#Plots residuals
 		plt.subplot(313)
-		plt.plot(shifted_w_tar[:l], chisq_indivs, color='gray')
-		plt.plot(shifted_w_tar, np.zeros(1024))
+		plt.plot(shifted_w_tar[f:l], chisq_indivs[f:l], color='gray')
+		plt.plot(shifted_w_tar[f:l], np.zeros((l-f)))
 		plt.subplot(313).set_ylim(-0.2, 0.2)
 # 		plt.annotate(label, xytext=()
 	
@@ -149,9 +150,9 @@ def yfcq(tar_source_id, spec_order, path_to_comp_sample_dataframe):
 		
 		label = '/Users/victoriaditomasso/Plotting_Spectra/'+str(row['shortname'])+'_'+str(chisq)+'.png'
 		print label
-		print type(label)
+# 		print type(label)
 		chisqs.append(chisq)
-# 		plt.savefig(label)
+		plt.savefig(label)
 
 # 		print chisq_indivs
 # 		print type(chisq_indivs)
